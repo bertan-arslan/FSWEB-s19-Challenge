@@ -37,7 +37,7 @@ public class TweetService {
     }
 
     public List<TweetResponse> findByUserId(Long userId){
-        return tweetRepository.findByUser_Id(userId)
+        return tweetRepository.findByUserId(userId)
                 .stream()
                 .map(this::toResponse)
                 .toList();
