@@ -18,42 +18,65 @@ public class TweetService {
 
     public TweetResponse create(String content, Long userId){
         User user = userService.getById(userId);
+
         Tweet tweet = Tweet.builder()
                 .content(content)
                 .user(user)
                 .build();
 
-        return toResponse(tweetRepository.save(tweet));
+        Tweet saved = tweetRepository.save(tweet);
+        return toResponse(saved);
     }
 
     public TweetResponse findById(Long id){
-        Tweet t = tweetRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Tweet not found"));
-        return toResponse(t);
+        Tweet tweet = tweetRepository.findById(id).orElse(null);
+        if (tweet == null) {
+            throw new IllegalArgumentException("Tweet not found");
+        }
+        return toResponse(tweet);
     }
 
     public List<TweetResponse> findByUserId(Long userId){
         return tweetRepository.findByUser_Id(userId)
-                .stream().map(this::toResponse).toList();
+                .stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     public TweetResponse update(Long tweetId, String newContent, Long requesterId){
-        Tweet t = tweetRepository.findById(tweetId)
-                .orElseThrow(() -> new IllegalArgumentException("Tweet not found"));
-        if(!t.getUser().getId().equals(requesterId)){
+        Tweet tweet = tweetRepository.findById(tweetId).orElse(null);
+        if (tweet == null) {
+            throw new IllegalArgumentException("Tweet not found");
+        }
+
+        if (!tweet.getUser().getId().equals(requesterId)) {
             throw new IllegalArgumentException("Only owner can update");
         }
-        t.setContent(newContent);
-        return toResponse(tweetRepository.save(t));
+
+        tweet.setContent(newContent);
+        Tweet updated = tweetRepository.save(tweet);
+        return toResponse(updated);
     }
 
     public void delete(Long tweetId, Long requesterId){
-        Tweet t = tweetRepository.findById(tweetId)
-                .orElseThrow(() -> new IllegalArgumentException("Tweet not found"));
-        if(!t.getUser().getId().equals(requesterId)){
+        Tweet tweet = tweetRepository.findById(tweetId).orElse(null);
+        if (tweet == null) {
+            throw new IllegalArgumentException("Tweet not found");
+        }
+
+        if (!tweet.getUser().getId().equals(requesterId)) {
             throw new IllegalArgumentException("Only owner can delete");
         }
-        tweetRepository.delete(t);
+
+        tweetRepository.delete(tweet);
+    }
+
+    public Tweet getEntityById(Long id){
+        Tweet tweet = tweetRepository.findById(id).orElse(null);
+        if (tweet == null) {
+            throw new IllegalArgumentException("Tweet not found");
+        }
+        return tweet;
     }
 
     private TweetResponse toResponse(Tweet t){

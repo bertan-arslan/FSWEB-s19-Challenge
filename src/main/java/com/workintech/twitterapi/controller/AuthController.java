@@ -7,6 +7,7 @@ import com.workintech.twitterapi.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,14 +16,22 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final UserService userService;
+    private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/register")
     public ResponseEntity<User> register(@Valid @RequestBody UserRegisterRequest req){
-        return ResponseEntity.ok(userService.register(req.getUsername(), req.getPassword()));
+        User created = userService.register(req.getUsername(), req.getPassword());
+        return ResponseEntity.ok(created);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<User> login(@Valid @RequestBody UserLoginRequest req){
-        return ResponseEntity.ok(userService.login(req.getUsername(), req.getPassword()));
+    public ResponseEntity<String> login(@Valid @RequestBody UserLoginRequest req){
+        User user = userService.findByUsername(req.getUsername());
+
+        if (user == null || !passwordEncoder.matches(req.getPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("Invalid credentials");
+        }
+
+        return ResponseEntity.ok("Login successful");
     }
 }

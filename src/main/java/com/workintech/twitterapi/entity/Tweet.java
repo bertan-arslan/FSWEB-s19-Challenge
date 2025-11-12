@@ -21,7 +21,7 @@ public class Tweet {
     private String content;
 
     @NotNull
-    @ManyToOne(optional=false, fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id", nullable=false)
     private User user;
 }

@@ -3,38 +3,39 @@ package com.workintech.twitterapi.service;
 import com.workintech.twitterapi.entity.User;
 import com.workintech.twitterapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public User register(String username, String password) {
-        userRepository.findByUsername(username)
-                .ifPresent(u -> { throw new IllegalArgumentException("Username already exists"); });
+        User existing = userRepository.findByUsername(username);
+        if (existing != null) {
+            throw new IllegalArgumentException("Username already exists");
+        }
 
         User user = User.builder()
                 .username(username)
-                .password(password)
+                .password(passwordEncoder.encode(password))
                 .build();
 
         return userRepository.save(user);
     }
 
-    public User login(String username, String password) {
-        Optional<User> opt = userRepository.findByUsername(username);
-        if (opt.isPresent() && opt.get().getPassword().equals(password)) {
-            return opt.get();
-        }
-        throw new IllegalArgumentException("Invalid credentials");
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username);
     }
 
-    public User getById(Long id){
-        return userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+    public User getById(Long id) {
+        User user = userRepository.findById(id).orElse(null);
+        if (user == null) {
+            throw new IllegalArgumentException("User not found");
+        }
+        return user;
     }
 }
