@@ -20,7 +20,7 @@ public class RetweetService {
         Tweet tweet = tweetService.getEntityById(tweetId);
         User user = userService.getById(userId);
 
-        if (retweetRepository.existsByTweet_IdAndUser_Id(tweetId, userId)) {
+        if (retweetRepository.existsByTweetIdAndUserId(tweetId, userId)) {
             throw new IllegalArgumentException("User already retweeted this tweet");
         }
 

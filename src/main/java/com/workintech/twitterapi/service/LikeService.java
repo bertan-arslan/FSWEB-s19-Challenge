@@ -20,8 +20,8 @@ public class LikeService {
         Tweet tweet = tweetService.getEntityById(tweetId);
         User user = userService.getById(userId);
 
-        if (likeRepository.existsByTweet_IdAndUser_Id(tweetId, userId)) {
-            long count = likeRepository.countByTweet_Id(tweetId);
+        if (likeRepository.existsByTweetIdAndUserId(tweetId, userId)) {
+            long count = likeRepository.countByTweetId(tweetId);
             return new LikeResponse(tweetId, count, true);
         }
 
@@ -32,18 +32,18 @@ public class LikeService {
 
         likeRepository.save(like);
 
-        long count = likeRepository.countByTweet_Id(tweetId);
+        long count = likeRepository.countByTweetId(tweetId);
         return new LikeResponse(tweetId, count, true);
     }
 
     public LikeResponse dislike(Long tweetId, Long userId){
-        Like like = likeRepository.findByTweet_IdAndUser_Id(tweetId, userId);
+        Like like = likeRepository.findByTweetIdAndUserId(tweetId, userId);
 
         if (like != null) {
             likeRepository.delete(like);
         }
 
-        long count = likeRepository.countByTweet_Id(tweetId);
+        long count = likeRepository.countByTweetId(tweetId);
         return new LikeResponse(tweetId, count, false);
     }
 }

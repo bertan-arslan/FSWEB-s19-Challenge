@@ -5,9 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface LikeRepository extends JpaRepository<Like, Long> {
 
-    boolean existsByTweet_IdAndUser_Id(Long tweetId, Long userId);
+    boolean existsByTweetIdAndUserId(Long tweetId, Long userId);
 
-    Like findByTweet_IdAndUser_Id(Long tweetId, Long userId);
+    Like findByTweetIdAndUserId(Long tweetId, Long userId);
 
-    long countByTweet_Id(Long tweetId);
+    long countByTweetId(Long tweetId);
 }
